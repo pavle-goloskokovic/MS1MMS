@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+
+<head>
+    <script type="text/javascript" src="src/shared/util.js"></script>
+    <script type="text/javascript" src="src/shared/colorspace.js"></script>
+    <script type="text/javascript" src="src/shared/function.js"></script>
+    <script type="text/javascript" src="src/shared/annotation.js"></script>
+    <script type="text/javascript" src="src/display/api.js"></script>
+    <script type="text/javascript" src="src/display/metadata.js"></script>
+    <script type="text/javascript" src="src/display/canvas.js"></script>
+    <script type="text/javascript" src="src/display/webgl.js"></script>
+    <script type="text/javascript" src="src/display/pattern_helper.js"></script>
+    <script type="text/javascript" src="src/display/font_loader.js"></script>
+
+    <script type="text/javascript">
+        // Specify the main script used to create a new PDF.JS web worker.
+        // In production, leave this undefined or change it to point to the
+        // combined `pdf.worker.js` file.
+        PDFJS.workerSrc = 'src/worker_loader.js';
+    </script>
+    <script type="text/javascript" src="main.js"></script>
+</head>
+
+<body>
+<div>
+    <button id="pp" disabled onclick="prevPage()">Previous Page</button>
+    <button id="np" disabled onclick="nextPage()">Next Page</button>
+    || Page <span id="currPage">-</span> / <span id="totalPages">-</span> ||
+    <span id="info">
+    <button id="pc" disabled onclick="prevChap()">Previous Chapter</button>
+    <button id="nc" disabled onclick="nextChap()">Next Chapter</button>
+    </span>
+</div>
+<canvas id="the-canvas" style="border:1px solid black; display: none;">
+    Your browser does not support html5 canvas.
+</canvas>
+
+</body>
+
+</html>
