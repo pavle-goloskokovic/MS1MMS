@@ -10,77 +10,82 @@ var _chapters;
 // Fetch the PDF document from the URL using promises
 //
 // http://cran.r-project.org/doc/manuals/R-intro.pdf
-PDFJS.getDocument('test-outline.pdf').then(function(pdf) {
 
-    _pdf = pdf;
+var init = function(url){
 
-    _totalPages = pdf.pdfInfo.numPages;
+    PDFJS.getDocument(url).then(function(pdf) {
 
-    document.getElementById('totalPages').innerHTML = _totalPages;
+        _pdf = pdf;
 
-    pdf.getOutline().then( function (outline) { //console.log(outline);
+        _totalPages = pdf.pdfInfo.numPages;
 
-            if(!outline) {
-                console.warn("No document outline available.");
-                document.getElementById('info').innerHTML = "No chapters data available in this document.";
-                showPage();
-                return;
-            }
+        document.getElementById('totalPages').innerHTML = _totalPages;
 
-            pdf.getDestinations().then( function (destinations) { //console.log(destinations);
+        pdf.getOutline().then( function (outline) { //console.log(outline);
 
-                    var pageIndexPromises = [];
-
-                    for(var i=0; i< outline.length; i++){
-                        var chapterDestination = destinations[outline[i].dest][0];
-                        pageIndexPromises.push(pdf.getPageIndex(chapterDestination));
-                    }
-
-                    globalScope.Promise.all(pageIndexPromises).then(
-                        function (results) {
-
-                            _chapters = results.sort(function(a,b){return a-b});
-                            for(var i = 0; i<_chapters.length; i++){
-                                _chapters[i]++;
-                            }
-                            if(_chapters[0]>1) {
-                                _chapters.unshift(1);
-                            }
-                            console.log(_chapters);
-
-                            showPage();
-                        },
-                        function (cause) {
-                            console.error(cause);
-                            showPage();
-                        }
-                    );
-
-                    /*pdf.getPageIndex(destinations["Dynamic graphics"][0]).then(
-                     function (index) {
-                     console.log(index);
-                     _index = index+1;
-                     showPage();
-                     },
-                     function () {
-                     console.log("getPageIndex rejected");
-                     }
-                     )*/
-                },
-                function () {
-                    console.log("dest rejected");
+                if(!outline) {
+                    console.warn("No document outline available.");
+                    document.getElementById('info').innerHTML = "No chapters data available in this document.";
                     showPage();
+                    return;
                 }
-            )
 
-        },
-        function (err) {
-            console.log("Document outline error: " + err.toString());
-            showPage();
-        }
-    );
+                pdf.getDestinations().then( function (destinations) { //console.log(destinations);
 
-});
+                        var pageIndexPromises = [];
+
+                        for(var i=0; i< outline.length; i++){
+                            var chapterDestination = destinations[outline[i].dest][0];
+                            pageIndexPromises.push(pdf.getPageIndex(chapterDestination));
+                        }
+
+                        globalScope.Promise.all(pageIndexPromises).then(
+                            function (results) {
+
+                                _chapters = results.sort(function(a,b){return a-b});
+                                for(var i = 0; i<_chapters.length; i++){
+                                    _chapters[i]++;
+                                }
+                                if(_chapters[0]>1) {
+                                    _chapters.unshift(1);
+                                }
+                                console.log(_chapters);
+
+                                showPage();
+                            },
+                            function (cause) {
+                                console.error(cause);
+                                showPage();
+                            }
+                        );
+
+                        /*pdf.getPageIndex(destinations["Dynamic graphics"][0]).then(
+                         function (index) {
+                         console.log(index);
+                         _index = index+1;
+                         showPage();
+                         },
+                         function () {
+                         console.log("getPageIndex rejected");
+                         }
+                         )*/
+                    },
+                    function () {
+                        console.log("dest rejected");
+                        showPage();
+                    }
+                )
+
+            },
+            function (err) {
+                console.log("Document outline error: " + err.toString());
+                showPage();
+            }
+        );
+
+    });
+
+};
 
 var _updateButtons = function () {
 
@@ -126,11 +131,15 @@ var showPage = function () {
         var scale = 1;
         var viewport = page.getViewport(scale);
 
+        var loading = document.getElementById('loading');
+        loading.style.display = "none";
+
         //
         // Prepare canvas using PDF page dimensions
         //
         var canvas = document.getElementById('the-canvas');
-        canvas.style.display = "block";
+        var link = document.getElementById('link');
+        canvas.style.display = link.style.display = "block";
         var context = canvas.getContext('2d');
         canvas.height = viewport.height;
         canvas.width = viewport.width;
