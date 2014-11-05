@@ -19,6 +19,8 @@ var init = function(url){
 
         _totalPages = pdf.pdfInfo.numPages;
 
+        generatePages(document.getElementById("container"));
+
         document.getElementById('totalPages').innerHTML = _totalPages;
 
         pdf.getOutline().then( function (outline) { //console.log(outline);
@@ -122,13 +124,64 @@ var _updateButtons = function () {
     }
 };
 
+var generatePages = function (container) {
+
+    var pagesPromises = [];
+
+    for(var i=1; i<=_totalPages; i++) {
+        var p = _pdf.getPage(i);
+        pagesPromises.push(p);
+    }
+
+    globalScope.Promise.all(pagesPromises).then(
+        function (pages) {
+
+            for(var i=0; i<pages.length; i++) {
+
+                var page = pages[i];
+
+                var scale = .1;
+                var viewport = page.getViewport(scale);
+
+                //
+                // Prepare canvas using PDF page dimensions
+                //
+                var canvas = document.createElement('canvas');
+                canvas.id = "page" + (i+1);
+                console.log(canvas.id);
+                var context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                container.appendChild(canvas);
+
+                //
+                // Render PDF page into canvas context
+                //
+                var renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                page.render(renderContext);
+            }
+        },
+        function (cause) {
+            console.error(cause);
+        }
+    );
+};
+
+
 var showPage = function () {
+
+    return;
+
     // Using promise to fetch the page
     _pdf.getPage(_index).then(function(page) {
 
         document.getElementById('currPage').innerHTML = _index.toString();
 
-        var scale = 1;
+        var scale = .1;
         var viewport = page.getViewport(scale);
 
         var loading = document.getElementById('loading');

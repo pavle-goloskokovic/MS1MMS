@@ -53,7 +53,7 @@ var otherFiles = [
   'core/jbig2.js',
   'core/bidi.js',
   'core/murmurhash3.js',
-  '../external/jpgjs/jpg.js'
+  'external/jpgjs/jpg.js'
 ];
 
 function loadInOrder(index, path, files) {
