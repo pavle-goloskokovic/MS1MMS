@@ -19,7 +19,7 @@ var init = function(url){
 
         _totalPages = pdf.pdfInfo.numPages;
 
-        generatePages(document.getElementById("container"));
+        generatePages(document.getElementById("pages"));
 
         document.getElementById('totalPages').innerHTML = _totalPages;
 
@@ -140,8 +140,10 @@ var generatePages = function (container) {
 
                 var page = pages[i];
 
-                var scale = .1;
+                var scale = .4;
                 var viewport = page.getViewport(scale);
+
+                var section = document.createElement('section');
 
                 //
                 // Prepare canvas using PDF page dimensions
@@ -153,7 +155,8 @@ var generatePages = function (container) {
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
 
-                container.appendChild(canvas);
+                section.appendChild(canvas);
+                container.appendChild(section);
 
                 //
                 // Render PDF page into canvas context
@@ -164,6 +167,8 @@ var generatePages = function (container) {
                 };
                 page.render(renderContext);
             }
+
+            pageFlip();
         },
         function (cause) {
             console.error(cause);
